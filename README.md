@@ -9,7 +9,7 @@ To install the developmental version from [GitHub](https://github.com/chenwencha
 
 ```
 if(!require(devtools)) install.packages("devtools")
-devtools::install_github("XuegongLab/scMetric", build_vignettes = TRUE)
+devtools::install_github("chenwenchang/scMetric", build_vignettes = TRUE)
 ```
 
 To load the installed scMetric in R:
