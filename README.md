@@ -39,7 +39,7 @@ Users can load the test data in *scMetric* by
 
 ```
 library(scMetric)
-data(testData)
+data("testData")
 ```
 The toy data *counts* in *testData* is a scRNA-seq read counts matrix which has 1000 cells (rows) and 1000 genes (columns). The object *label1* and *label2* are two vectors specifying two kinds of grouping.
 
