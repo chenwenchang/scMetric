@@ -1,6 +1,6 @@
 # scMetric
 
-scMetric is an R package that apply a metric learning algorithm to scRNA-seq data. It allows users to give example samples to tell expected angle they would use to analyze the data, and the package learns the metric from the examples and apply the metric for downstream clustering and visualization. The package also outputs the genes that are weighted as more important in learned metric. 
+**`scMetric`** is an R package that apply a metric learning algorithm to scRNA-seq data. It allows users to give example samples to tell expected angle they would use to analyze the data, and the package learns the metric from the examples and apply the metric for downstream clustering and visualization. The package also outputs the genes that are weighted as more important in learned metric. 
 
 For more information, please refer to the [manuscript](https://www.biorxiv.org/content/early/2018/10/30/456814) by Wenchang Chen and Xuegong Zhang.
 ## Installing
@@ -21,7 +21,7 @@ library(scMetric)
 ## Input
 
 scMetric takes 7 inputs: 
-* X: a scRNA-seq gene expression matrix, cells for rows and genes for columns
+* `X`: a scRNA-seq gene expression matrix, cells for rows and genes for columns
 * label: a vector of factors specifying which group cells belong to,corresponding to rows in X. 
 * constraints: weak supervision information, a few pairs of cells and whether they are similar or not
 * numofConstraints: total number of similar and dissimilar pairs the user wants to use
