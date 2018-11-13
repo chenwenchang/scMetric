@@ -215,7 +215,7 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
     return(A)
   }
 
-  draw_tSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
+  drawTSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
     if(length(label) == 0){
       label <- array(1, dim(X)[1])
       labelname = c(1)
@@ -272,16 +272,16 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
   sortw$ix <- colnames(X)[sortw$ix]
   #save(sortw, file="sortw.Rdata")
 
-  #draw_tSNE
+  #draw tSNE plot
   if(draw_tSNE){
     #draw tsne plot
     tsneresult1 <- Rtsne(X, perplexity = 100, pca = TRUE)
     twoD1 <- as.data.frame(tsneresult1$Y)
-    draw_tSNE(X=twoD1, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="euclidean_metric.jpg")
+    drawTSNE(X=twoD1, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="euclidean_metric.jpg")
 
     tsneresult2 <- Rtsne(X_new, perplexity = 100, pca = TRUE)
     twoD2 <- as.data.frame(tsneresult2$Y)
-    draw_tSNE(X=twoD2, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="new_metric.jpg")
+    drawTSNE(X=twoD2, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="new_metric.jpg")
   }
   res <- list(newData = X_new, newMetric = M, constraints = constraints, sortGenes = sortw)
   return(res)
