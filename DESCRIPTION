@@ -1,7 +1,7 @@
 Package: scMetric
 Type: Package
 Title: Metric learning and visualization for single cell RNA-seq data 
-Version: 0.1.0
+Version: 1.0.1
 Author: Wenchang Chen
 Maintainer: Wenchang Chen <chenwc17@mails.tsinghua.edu.cn>
 Description: We developed the package scMetric to apply ITML algorithm on gene expression data. The package let users to assign a few pairs of cells that are similar with each other and assign a few pairs of dissimilar cells. With this weak training information, scMetric learns the metric A to best preserve the similarity and dissimilarity reflected in the training pairs. It then employs t-SNE to visualize the data using this metric. The package also outputs the t-SNE map using the conventional Euclidean distance metric. The learned metric A as well as the key genes that compose most weights in the metric can also be output to other analysis methods that need a distance or similarity metric.
@@ -9,4 +9,5 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.4.3)
+Imports：Rtsne, ggplot2
 RoxygenNote: 6.1.1

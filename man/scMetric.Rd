@@ -41,7 +41,4 @@ downstream clustering and visualization.
 data(testData)
 res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, draw_tSNE = TRUE)
 
-importFrom Rtsne Rtsne
-importFrom ggplot2 ggplot
-export
 }

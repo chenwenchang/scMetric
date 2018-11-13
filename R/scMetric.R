@@ -26,9 +26,9 @@
 #' data(testData)
 #' res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, draw_tSNE = TRUE)
 #'
-#' importFrom Rtsne Rtsne
-#' importFrom ggplot2 ggplot
-#' export
+#' @importFrom Rtsne Rtsne
+#' @importFrom ggplot2 ggplot
+#' @export
 
 
 scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100, thresh = 10e-3, max_iters = 100000, draw_tSNE = FALSE){
