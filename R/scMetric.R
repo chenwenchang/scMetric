@@ -1,4 +1,30 @@
-scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100, thresh = 10e-3, max_iters = 100000, drawTSNE = FALSE){
+#' scMetric: metric learning and visualization for scRNA-seq data
+#'
+#' Apply a weakly supervised metric learning algorithm ITML to scRNA-seq data.
+#' Users give very few training samples to tell expected angle they would use
+#' to analyze the data, and the function learns the metric automatically for
+#' downstream clustering and visualization.
+#'
+#' @param X A scRNA-seq expression matrix, cells for rows and genes for columns.
+#' @param label A vector. Specify which group cells belong to, corresponding to rows in X. If NULL(default), \code{constraints} should not be NULL.
+#' @param constraints A N by 3 matrix. Weak supervision information. N stands for total number of cell pairs. The first 2 columns specify pairs of cells. The 3rd column is a value specifying whether corresponding two cells in the first two columns are similar, 1 for similar and -1 for dissimilar. If NULL(default), \code{label} cannot be NULL and \code{num_constraints} pairs will be chosen randomly according to \code{label} for metric learning. Cells that have the same label are similar. Otherwise, they are dissimilar.
+#' @param num_constraints Total number of similar and dissimilar pairs that are used. No larger than N. If \code{constraints} is not NULL, first \code{num_constraints} rows of \code{constraints} will be used. Default: 100
+#' @param thresh threshold that decides when metric learning iteration stops. Default: 0.01
+#' @param max_iters max iterations of metric learning. Default: 100000
+#' @param draw_tSNE Boolean. Default: FALSE. Specify whether to draw tSNE plot or not
+#'
+#' @return
+#' List containing four outpus:
+#' @param newData new data based on new metric, rows are cells and columns are linear combination of original genes expressions
+#' @param newMetric learned metric, a d by d matric where d represents genes numbers
+#' @param constraints constraints used for metric learning
+#' @param sortGenes genes sorted by importance score
+#'
+#' examples
+#' data(testData)
+#' res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, drawTSNE = TRUE)
+
+scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100, thresh = 10e-3, max_iters = 100000, draw_tSNE = FALSE){
 
   # Invalid input control
   if(!is.matrix(X) & !is.data.frame(X))
@@ -13,7 +39,7 @@ scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100
     warning("Library size of zero detected in 'X'");gc();
 
   if(!is.null(label)){
-    if(nrow(X) != nrow(label))
+    if(nrow(X) != length(label))
       stop("Row number of 'label' must equal to row number of 'X'")
   }
   if(!is.null(constraints)){
@@ -23,15 +49,17 @@ scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100
       stop("Wrong format of 'constraints'")
     if((sum(constraints[,3] == 1) + sum(constraints[,3] == -1)) != nrow(constraints))
       stop("Wrong value in 3rd colume of 'constraints'. Must be 1 for similar pairs and -1 for dissimilar pairs")
+    if(num_constraints > nrow(constraints))
+      stop("No enough constraints!Set 'num_constraints' smaller!")
   }
-  if(!is.numeric(numOfConstraints))
-    stop("Wrong data type of 'numOfConstraints'")
-  if(round(numOfConstraints) != numOfConstraints)
-    stop("'numOfConstraints' should be integer")
-  if(numOfConstraints <= 0)
-    stop("'numOfConstraints' should be positive")
+  if(!is.numeric(num_constraints))
+    stop("Wrong data type of 'num_constraints'")
+  if(round(num_constraints) != num_constraints)
+    stop("'num_constraints' should be integer")
+  if(num_constraints <= 0)
+    stop("'num_constraints' should be positive")
 
-  
+
   # if(gamma <= 0)
   #   stop("'gamma' should be positive")
 
@@ -180,16 +208,16 @@ scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100
     return(A)
   }
 
-  drawtSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
+  draw_tSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
     library("ggplot2")
     if(length(label) == 0){
       label <- array(1, dim(X)[1])
       labelname = c(1)
     }
-    p <- ggplot(X, aes(x=X[,1], y=X[,2])) 
+    p <- ggplot(X, aes(x=X[,1], y=X[,2]))
     p <- p + geom_point(aes(color=factor(label)), size = point_size) + xlab("tSNE1") + ylab("tSNE2")
     p <- p + scale_color_brewer(name=legendname, labels = labelname, type="seq", palette = colorset)
-    mytheme <- theme_bw() + 
+    mytheme <- theme_bw() +
       theme(plot.title=element_text(size=rel(1.5),hjust=0.5),
             axis.title=element_text(size=rel(1)),
             axis.text=element_text(size=rel(1)),
@@ -202,7 +230,7 @@ scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100
     print(p + mytheme + guides(colour = guide_legend(override.aes = list(size = 6))))
     #ggsave(filename, dpi = 600)
   }
-  
+
   A0 <- diag(1, ncol(X))
   extremeDistance <- ComputeExtremeDistance(X, 5, 95, A0)
   print(extremeDistance)
@@ -211,22 +239,22 @@ scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100
   gamma <- 10000
   params <- data.frame(thresh, gamma, max_iters)
   if (is.null(constraints)){
-    constraints <- GetConstraints(label, numOfConstraints)
+    constraints <- GetConstraints(label, num_constraints)
     #save(constraints, file="constraints.Rdata")
   }
   else{
-    if (numOfConstraints > nrow(constraints)){
-      constraints <- rbind(constraints, GetConstraints(label, numOfConstraints - nrow(constraints)))
+    if (num_constraints > nrow(constraints)){
+      constraints <- rbind(constraints, GetConstraints(label, num_constraints - nrow(constraints)))
     }
   }
-  constraints <- constraints[1:numOfConstraints,]
+  constraints <- constraints[1:num_constraints,]
   isSimilar <- u * (1 - constraints[,3]) / 2  + l * (constraints[,3] + 1) / 2
   constraints <- cbind(constraints, isSimilar)
   print(constraints)
   M <- ItmlAlg(constraints, X, params)
   L = chol(M)
   X_new <- X %*% t(L)
-  
+
   #find key genes
   delta <- array(1, c(dim(L)[2], 1))
   w <- array(1, dim(L)[2])
@@ -237,18 +265,18 @@ scMetric <- function(X, label = NULL, constraints = NULL, numOfConstraints = 100
   sortw <- sort(w, index.return = TRUE, decreasing = TRUE)
   sortw$ix <- colnames(X)[sortw$ix]
   #save(sortw, file="sortw.Rdata")
-  
-  #drawTSNE
-  if(drawTSNE){
+
+  #draw_tSNE
+  if(draw_tSNE){
     library(Rtsne)
     #draw tsne plot
     tsneresult1 <- Rtsne(X, perplexity = 100, pca = TRUE)
     twoD1 <- as.data.frame(tsneresult1$Y)
-    drawtSNE(X=twoD1, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="euclidean_metric.jpg")
-    
+    draw_tSNE(X=twoD1, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="euclidean_metric.jpg")
+
     tsneresult2 <- Rtsne(X_new, perplexity = 100, pca = TRUE)
     twoD2 <- as.data.frame(tsneresult2$Y)
-    drawtSNE(X=twoD2, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="new_metric.jpg")
+    draw_tSNE(X=twoD2, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="new_metric.jpg")
   }
   res <- list(newData = X_new, newMetric = M, constraints = constraints, sortGenes = sortw)
   return(res)
