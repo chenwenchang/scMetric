@@ -28,7 +28,7 @@
 #'
 #' @importFrom Rtsne Rtsne
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes geom_point scale_color_brewer theme_bw theme guide_legend
+#' @importFrom ggplot2 rel element_text element_line xlab ylab aes geom_point scale_color_brewer theme_bw theme guide_legend
 #' @export
 
 
