@@ -5,24 +5,31 @@
 #' to analyze the data, and the function learns the metric automatically for
 #' downstream clustering and visualization.
 #'
-#' @param X A scRNA-seq expression matrix, cells for rows and genes for columns.
-#' @param label A vector. Specify which group cells belong to, corresponding to rows in X. If NULL(default), \code{constraints} should not be NULL.
-#' @param constraints A N by 3 matrix. Weak supervision information. N stands for total number of cell pairs. The first 2 columns specify pairs of cells. The 3rd column is a value specifying whether corresponding two cells in the first two columns are similar, 1 for similar and -1 for dissimilar. If NULL(default), \code{label} cannot be NULL and \code{num_constraints} pairs will be chosen randomly according to \code{label} for metric learning. Cells that have the same label are similar. Otherwise, they are dissimilar.
-#' @param num_constraints Total number of similar and dissimilar pairs that are used. No larger than N. If \code{constraints} is not NULL, first \code{num_constraints} rows of \code{constraints} will be used. Default: 100
+#' @param X a scRNA-seq expression matrix, cells for rows and genes for columns.
+#' @param label a vector. Specify which group cells belong to, corresponding to rows in X. If NULL(default), \code{constraints} should not be NULL.
+#' @param constraints a N by 3 matrix, weak supervision information. N stands for total number of cell pairs. The first 2 columns specify two cells. The 3rd column is a value specifying whether corresponding two cells in the first two columns are similar, 1 for similar and -1 for dissimilar. If NULL(default), \code{label} cannot be NULL and \code{num_constraints} pairs will be chosen randomly according to \code{label} for metric learning. Cells that have the same label are similar. Otherwise, they are dissimilar.
+#' @param num_constraints total number of similar and dissimilar pairs that are used. No larger than N. If \code{constraints} is not NULL, first \code{num_constraints} rows of \code{constraints} will be used. Default: 100
 #' @param thresh threshold that decides when metric learning iteration stops. Default: 0.01
 #' @param max_iters max iterations of metric learning. Default: 100000
-#' @param draw_tSNE Boolean. Default: FALSE. Specify whether to draw tSNE plot or not
+#' @param draw_tSNE boolean. Default: FALSE. Specify whether to draw tSNE plot or not
 #'
 #' @return
-#' List containing four outpus:
-#' @param newData new data based on new metric, rows are cells and columns are linear combination of original genes expressions
-#' @param newMetric learned metric, a d by d matric where d represents genes numbers
-#' @param constraints constraints used for metric learning
-#' @param sortGenes genes sorted by importance score
+#' List containing four outputs:
+#' \itemize{
+#' \item newData: new data based on new metric, rows are cells and columns are linear combination of original genes expressions
+#' \item newMetric: learned metric, a d by d matric where d represents genes numbers
+#' \item constraints: constraints used for metric learning
+#' \item sortGenes: genes sorted by importance score
+#' }
 #'
-#' examples
+#' @examples
 #' data(testData)
-#' res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, drawTSNE = TRUE)
+#' res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, draw_tSNE = TRUE)
+#'
+#' importFrom Rtsne Rtsne
+#' importFrom ggplot2 ggplot
+#' export
+
 
 scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100, thresh = 10e-3, max_iters = 100000, draw_tSNE = FALSE){
 
@@ -209,7 +216,6 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
   }
 
   draw_tSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
-    library("ggplot2")
     if(length(label) == 0){
       label <- array(1, dim(X)[1])
       labelname = c(1)
@@ -268,7 +274,6 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
 
   #draw_tSNE
   if(draw_tSNE){
-    library(Rtsne)
     #draw tsne plot
     tsneresult1 <- Rtsne(X, perplexity = 100, pca = TRUE)
     twoD1 <- as.data.frame(tsneresult1$Y)
