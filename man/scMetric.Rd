@@ -39,6 +39,6 @@ downstream clustering and visualization.
 }
 \examples{
 data(testData)
-res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, draw_tSNE = TRUE)
+res <- scMetric(counts, label = label1, num_constraints = 50, thresh = 0.1, draw_tSNE = TRUE)
 
 }
