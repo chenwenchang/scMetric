@@ -5,7 +5,7 @@
 For more information, please refer to the [manuscript](https://www.biorxiv.org/content/early/2018/10/30/456814) by Wenchang Chen and Xuegong Zhang.
 ## Installing
 
-To install the developmental version from [GitHub](https://github.com/chenwenchang/scMetric): 
+The package is developed . Users should . To install the developmental version from [GitHub](https://github.com/chenwenchang/scMetric): 
 
 ```
 if(!require(devtools)) install.packages("devtools")
@@ -22,16 +22,16 @@ library(scMetric)
 
 **`scMetric`** takes 7 inputs: 
 * **`X`**: a scRNA-seq gene expression matrix, cells for rows and genes for columns
-* **`label`**: a vector of factors specifying which group cells belong to,corresponding to rows in X. 
+* **`label`**: a vector specifying which group cells belong to,corresponding to rows in X. 
 * **`constraints`**: weak supervision information, a few pairs of cells along with whether they are similar or not
-* **`numofConstraints`**: total number of similar and dissimilar pairs the user wants to use
-* **`thresh`**: threshold that decides when metric learning iteration stops
-* **`max_iters`**: max metric learning iterations
-* **`drawTSNE`**: if users want **`scMetric`** to draw tSNE plot
+* **`num_constraints`**: total number of similar and dissimilar pairs that are used
+* **`thresh`**: threshold that decides when metric learning iteration stops. Default: 0.01
+* **`max_iters`**: max iterations of metric learning. Default: 100000 
+* **`draw_tSNE`**: whether to draw tSNE plot or not
 
-If users provide `constraints` themselves, the input `label` is used for visualization only. If users want **`scMetric`** to select `constraints` automatically, then `label` is used for selecting similar and dissimilar pairs. 
+If users provide `constraints` themselves, the input `label` is used for visualization only. If users want **`scMetric`** to select `constraints` automatically, then `label` is used for selecting similar and dissimilar pairs. Cells that have the same label are similar. Otherwise, they are dissimilar.
 
-Default `numofConstraints` value is 100. Users should give a number for particular use.
+Default `num_constraints` value is 100. Users should give a number for particular use.
 
 ## Test data
 
@@ -53,7 +53,7 @@ library(scMetric)
 data(testData)
 
 # Learning metric using label1 as similarity
-res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, drawTSNE = TRUE)
+res <- scMetric(counts, label = label1, num_constraints = 50, thresh = 0.1, draw_tSNE = TRUE)
 
 ```
 
@@ -62,7 +62,7 @@ res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, dra
 * **`newData`**: new data based on new metric which can be used for downstream analysis
 * **`newMetric`**: learned metric, a d by d matric where d represents genes numbers
 * **`constraints`**: constraints which **`scMetric`** uses
-* **`sortGenes`**: genes sorted by weights the new metric assigns
+* **`sortGenes`**: genes sorted by importance score
 
 ## Authors
 
@@ -73,3 +73,5 @@ res <- scMetric(counts, label = label1, numOfConstraints = 50, thresh = 0.1, dra
 
 This work is supported by CZI HCA pilot project, the National Key R&D Program of China grant 2018YFC0910400 and the NSFC grant 61721003.
 
+## References
+Jason V. Davis, Brian Kulis, Prateek Jain, Suvrit Sra, and Inderjit S. Dhillon.  "Information-theoretic Metric Learning."  Proc. 24th International Conference on Machine Learning (ICML), 2007.
