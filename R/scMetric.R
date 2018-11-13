@@ -28,6 +28,7 @@
 #'
 #' @importFrom Rtsne Rtsne
 #' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
 #' @export
 
 

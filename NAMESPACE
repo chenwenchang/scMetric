@@ -2,4 +2,5 @@
 
 export(scMetric)
 importFrom(Rtsne,Rtsne)
+importFrom(ggplot2,aes)
 importFrom(ggplot2,ggplot)
