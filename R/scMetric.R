@@ -189,7 +189,7 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
         bhat[i] <- solve(1 / bhat[i] - alpha / gamma)
 
       }
-      A <- A + beta[1,1] * A %*% v %*% t(v) %*% A
+      A <- A + beta[1,1] * A %*% as.matrix(v) %*% as.matrix(t(v)) %*% A
 
       if(i == c){
         normsum <- sqrt(sum(lambda^2)) + sqrt(sum(lambdaold^2))
