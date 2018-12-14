@@ -91,11 +91,12 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
       j2 <- ceiling(runif(1) * n)
       dists[i] <- (X[j1,]- X[j2,]) %*% M %*% (X[j1,]- X[j2,])
     }
+    dists <- dists[which(dists != 0)]
+    hres <- hist(dists, 100)
+    num_bins <- length(hres$mid)
 
-
-    l <- floor(a/100 * max(dists))
-    u <- floor(b/100 * max(dists))
-
+    l <- hres$mid[floor(a / 100 * num_bins)]
+    u <- hres$mid[floor(b / 100 * num_bins)]
     return(c(l, u))
   }
 
@@ -216,7 +217,7 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
     return(A)
   }
 
-  drawTSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
+  DrawTSNE <- function(X, label = NULL, legendname = 'cell groups', point_size = 1, labelname = NULL, filename = '0.jpg', colorset = "Set1"){
     if(length(label) == 0){
       label <- array(1, dim(X)[1])
       labelname = c(1)
@@ -237,12 +238,12 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
     print(p + mytheme + guides(colour = guide_legend(override.aes = list(size = 6))))
     #ggsave(filename, dpi = 600)
   }
-
+  
   A0 <- diag(1, ncol(X))
-  extremeDistance <- ComputeExtremeDistance(X, 5, 95, A0)
-  print(extremeDistance)
-  l <- extremeDistance[1]
-  u <- extremeDistance[2]
+  extreme_dist <- ComputeExtremeDistance(X, 5, 95, A0)
+  print(extreme_dist)
+  l <- extreme_dist[1]
+  u <- extreme_dist[2]
   gamma <- 10000
   params <- data.frame(thresh, gamma, max_iters)
   if (is.null(constraints)){
@@ -255,8 +256,8 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
     }
   }
   constraints <- constraints[1:num_constraints,]
-  isSimilar <- u * (1 - constraints[,3]) / 2  + l * (constraints[,3] + 1) / 2
-  constraints <- cbind(constraints, isSimilar)
+  is_similar <- u * (1 - constraints[,3]) / 2  + l * (constraints[,3] + 1) / 2
+  constraints <- cbind(constraints, is_similar)
   print(constraints)
   M <- ItmlAlg(constraints, X, params)
   L = chol(M)
@@ -278,11 +279,11 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
     #draw tsne plot
     tsneresult1 <- Rtsne(X, perplexity = 100, pca = TRUE)
     twoD1 <- as.data.frame(tsneresult1$Y)
-    drawTSNE(X=twoD1, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="euclidean_metric.jpg")
+    DrawTSNE(X=twoD1, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="euclidean_metric.jpg")
 
     tsneresult2 <- Rtsne(X_new, perplexity = 100, pca = TRUE)
     twoD2 <- as.data.frame(tsneresult2$Y)
-    drawTSNE(X=twoD2, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="new_metric.jpg")
+    DrawTSNE(X=twoD2, label = label, legendname='cell groups', labelname = c(1:length(unique(label))), filename="new_metric.jpg")
   }
   res <- list(newData = X_new, newMetric = M, constraints = constraints, sortGenes = sortw)
   return(res)
