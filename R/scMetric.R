@@ -84,7 +84,7 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
       stop('b must be between 1 and 100')
 
     n <- dim(X)[1]
-    num_trials <- min(10000, n*(n-1))
+    num_trials <- min(1000, n*(n-1))
     dists <- c()
     for (i in 1:num_trials) {
       j1 <- ceiling(runif(1) * n)
