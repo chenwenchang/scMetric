@@ -32,7 +32,7 @@
 #' @export
 
 
-scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100, thresh = 10e-3, max_iters = 100000, draw_tSNE = FALSE){
+scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100, thresh = 10e-3, max_iters = 100000, draw_tSNE = FALSE, l = 100, u = 10000){
 
   # Invalid input control
   if(!is.matrix(X) & !is.data.frame(X))
@@ -241,8 +241,8 @@ scMetric <- function(X, label = NULL, constraints = NULL, num_constraints = 100,
   A0 <- diag(1, ncol(X))
   extremeDistance <- ComputeExtremeDistance(X, 5, 95, A0)
   print(extremeDistance)
-  l <- extremeDistance[1]
-  u <- extremeDistance[2]
+  # l <- extremeDistance[1]
+  # u <- extremeDistance[2]
   gamma <- 10000
   params <- data.frame(thresh, gamma, max_iters)
   if (is.null(constraints)){
